@@ -77,6 +77,12 @@ npm.cmd run build
 
 このプロジェクトはViteアプリです。VercelではGitHubリポジトリをImportして公開します。
 
+対象リポジトリ:
+
+```text
+https://github.com/jmiyanaga/ipm_moc
+```
+
 VercelのProject Settingsでは以下を指定してください。
 
 | 項目 | 設定値 |
@@ -85,14 +91,17 @@ VercelのProject Settingsでは以下を指定してください。
 | Install Command | `npm install` |
 | Build Command | `npm run build` |
 | Output Directory | `dist` |
+| Production Branch | `main` |
 
 手順:
 
-1. GitHubリポジトリ `https://github.com/jmiyanaga/ipm_moc` をVercelにImportする
-2. Framework Presetで `Vite` を選択する
-3. Build Commandが `npm run build` になっていることを確認する
-4. Output Directoryが `dist` になっていることを確認する
-5. Deployする
+1. VercelでGitHub連携を有効にする
+2. GitHubリポジトリ `jmiyanaga/ipm_moc` をImportする
+3. Framework Presetで `Vite` を選択する
+4. Build Commandが `npm run build` になっていることを確認する
+5. Output Directoryが `dist` になっていることを確認する
+6. Production Branchが `main` になっていることを確認する
+7. Deployする
 
 `main` ブランチにpushすると、VercelのGitHub連携により自動で再デプロイされます。
 
