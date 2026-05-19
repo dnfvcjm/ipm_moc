@@ -1,8 +1,8 @@
 # DN IPM Spectral Scouting Mock
 
-農業の圃場で使う「スペクトルカメラによるScouting体験」と「病害予兆確認体験」をブラウザ上で確認するためのモックアプリです。
+農業圃場で使う「スペクトルカメラによるScouting体験」と「解析後の局所対応判断体験」を確認するためのReact/Viteモックです。
 
-現場作業者がハウス内でレーン・株を選び、葉をスペクトルカメラで撮影して保存します。その後、管理者が解析結果をA/B/C/Z分類やヒートマップで確認し、重点観察や天敵散布などの判断につなげる流れを体験できます。
+現場作業者は、事前に決まっている `House-01 / Lane 03` を確認し、レーン入口のQR読取Mockから80株を順番に撮影します。撮影後はピンボケ確認を行い、有効写真だけをSDカード保存MockとしてlocalStorageに保存します。管理者画面では未解析データを疑似解析し、5m / 3株単位のArea Heatmap、週次の時間軸Heatmap、防除記録とリスク推移を確認できます。
 
 ## 技術スタック
 
@@ -41,49 +41,96 @@ npm.cmd run build
 ## 画面一覧
 
 - ホーム
-- S-01 Scouting開始
-- S-02 レーン・株番号入力
-- S-03 撮影ガイド
-- S-04 撮影確認
-- S-05 保存完了
-- A-01 DN IPM Appホーム
-- A-02 解析結果一覧
-- A-03 分類結果表示
-- A-04 ヒートマップ
-- A-05 詳細確認・判断
+- 今日の対象圃場
+- レーンQR読取
+- Lane 03 撮影セッション
+- ピンボケ確認
+- Lane 03 撮影完了
+- SDカード保存データ
+- 未解析データ一覧
+- エリア別リスクHeatmap
+- 時間軸Heatmap
+- エリア詳細
+- 全体リスク推移
 
-## 主要な操作シナリオ
+## 主要シナリオ
 
-### シナリオ1: 撮影する
+### 1. 撮影する
 
-1. ホーム画面で「Scoutingを開始」を押す
-2. Scouting開始画面で「Start」を押す
-3. レーンNoと株Noを入力し「次へ」を押す
-4. 撮影ガイドで「撮影」を押す
-5. 撮影完了画面でメタデータを確認し「保存」を押す
-6. 保存完了画面で「次の株へ」を押すと株Noが1つ進む
+1. ホームで「今日の圃場を確認」を押す
+2. 対象圃場と対象レーンを確認する
+3. 「レーン入口へ移動した」を押す
+4. QR読取Mockで `Lane 03` を取得する
+5. 「撮影を開始」を押す
+6. Plant 001からPlant 080まで順番に撮影する
+7. ピンボケ確認で「問題なし・保存」または「ピンボケ・再撮影」を選ぶ
+8. Plant 007とPlant 042は初回のみピンボケ画像が表示される
+9. 80株分の有効写真が保存される
+10. 撮影完了画面でSDカード保存Mockの状態を確認する
 
-### シナリオ2: 解析結果を見る
+### 2. 解析する
 
-1. ホーム画面で「解析結果を確認」を押す
-2. 「スペクトルカメラ画像解析を開く」を押す
-3. 解析結果一覧で「モック解析を実行」を押す
-4. 「分類結果を見る」からA/B/C/Z分類を確認する
-5. 「ヒートマップを見る」で圃場全体の分布を見る
-6. セルをクリックして詳細確認・判断画面を開く
-7. 判断メモを入力して「判断を保存」を押す
+1. ホームで「解析・Heatmapを見る」を押す
+2. 未解析バッチを確認する
+3. 「未解析データを解析」を押す
+4. 写真単位に `riskScore`、`classification`、`isProblem` が付与される
+5. Area単位に問題写真数 / 有効写真総数が集計される
+6. バッチの解析ステータスが `解析済み` になる
 
-## Vercel公開手順
+### 3. Heatmapでリスクを見る
 
-このプロジェクトはViteアプリです。VercelではGitHubリポジトリをImportして公開します。
+1. エリア別リスクHeatmapを開く
+2. Area 01〜Area 27のリスク分布を見る
+3. 問題写真数 / 有効写真総数と推奨ボトル数を確認する
+4. 時間軸スライダーで5週前〜今週を切り替える
+5. Areaセルをクリックして詳細へ進む
+
+### 4. 防除効果を見る
+
+1. エリア詳細を開く
+2. 元画像とスペクトル画像を確認する
+3. 防除記録で「いつ、何本撒いたか」を確認する
+4. リスクグレードとボトル数の時系列チャートを見る
+
+## 使用画像
+
+画像URLが未指定だったため、プロジェクト内に確認用のSVGモック画像を配置しています。
+
+- 元画像: `public/assets/images/original-leaf.svg`
+- ピンボケ元画像: `public/assets/images/original-leaf-blur.svg`
+- スペクトル画像: `public/assets/images/spectral-leaf.svg`
+
+実画像が入手できた場合は、同じパスに差し替えるか、`src/data/appConfig.ts` の `IMAGE_PATHS` を更新してください。
+
+## モックとして代替しているもの
+
+- スペクトルカメラ実機連携
+- QRコード実読み取り
+- SDカード実アクセス
+- AI解析モデル
+- 防除記録入力
+- 本番DB
+
+## 今後の拡張候補
+
+- 実QR読取
+- 実SDカード / ファイル取り込み
+- スペクトルカメラ連携
+- 実AI解析API連携
+- 防除記録入力画面
+- 作業指示・タスク連携
+- オフライン対応
+- 圃場全体マップ連携
+
+## Vercel公開設定
+
+VercelでGitHubリポジトリをImportする場合は、以下の設定にしてください。
 
 対象リポジトリ:
 
 ```text
 https://github.com/jmiyanaga/ipm_moc
 ```
-
-VercelのProject Settingsでは以下を指定してください。
 
 | 項目 | 設定値 |
 | --- | --- |
@@ -93,31 +140,9 @@ VercelのProject Settingsでは以下を指定してください。
 | Output Directory | `dist` |
 | Production Branch | `main` |
 
-手順:
+`vercel.json` で全パスを `index.html` にrewriteしているため、`/heatmap` や `/area/Area%2010` などのReact Router URLを直接開いても表示できます。
 
-1. VercelでGitHub連携を有効にする
-2. GitHubリポジトリ `jmiyanaga/ipm_moc` をImportする
-3. Framework Presetで `Vite` を選択する
-4. Build Commandが `npm run build` になっていることを確認する
-5. Output Directoryが `dist` になっていることを確認する
-6. Production Branchが `main` になっていることを確認する
-7. Deployする
-
-`main` ブランチにpushすると、VercelのGitHub連携により自動で再デプロイされます。
-
-## React Router向けVercel設定
-
-`vercel.json` で全パスを `index.html` にrewriteしています。これにより、`/admin/analysis` や `/admin/heatmap` などのURLを直接開いても404にならず、React Routerで画面を表示できます。
-
-## GitHubへの反映例
-
-```powershell
-git add .
-git commit -m "Prepare Vercel deployment"
-git push
-```
-
-## 今後の更新手順
+## 更新手順
 
 ```powershell
 npm.cmd run build
@@ -126,20 +151,4 @@ git commit -m "update"
 git push
 ```
 
-push後、Vercelが自動でビルドとデプロイを実行します。
-
-## モックであり本番連携していないもの
-
-- スペクトルカメラ実機連携
-- AI解析モデル
-- バックエンドDB
-- QRコード実読み取り
-
-## 今後の拡張候補
-
-- 実カメラ連携
-- QR読取
-- オフライン対応
-- API連携
-- 実圃場マップ連携
-- 分類モデル接続
+`main` ブランチにpushすると、VercelのGitHub連携により自動デプロイされます。
