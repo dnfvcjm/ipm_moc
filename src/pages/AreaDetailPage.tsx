@@ -7,7 +7,7 @@ import SummaryCard from '../components/SummaryCard';
 import { FIELD_ID, IMAGE_PATHS, TARGET_LANE_NO } from '../data/appConfig';
 import { sampleTreatments } from '../data/sampleTreatments';
 import { sampleWeeklyRisk } from '../data/sampleWeeklyRisk';
-import { classificationDefinitions } from '../utils/analysis';
+import { useI18n } from '../i18n/LanguageContext';
 import { formatDate } from '../utils/format';
 import { getCurrentAreaRiskSummaries, getPhotoRecords } from '../utils/storage';
 
@@ -22,6 +22,7 @@ const getSelectedSummary = (areaId: string, weekOffset: number) => {
 };
 
 export default function AreaDetailPage() {
+  const { riskLabel, riskPolicy, t, treatmentNote, weekLabel } = useI18n();
   const { areaId = 'Area 10' } = useParams();
   const decodedAreaId = decodeURIComponent(areaId);
   const [searchParams] = useSearchParams();
@@ -37,107 +38,106 @@ export default function AreaDetailPage() {
   if (!summary) {
     return (
       <main className="page-shell narrow-page">
-        <AppHeader current="エリア詳細" />
+        <AppHeader current={t.areaDetail.current} />
         <section className="panel action-panel">
-          <h1>エリア情報がありません</h1>
-          <Link className="button button-primary" to="/heatmap">Heatmapへ戻る</Link>
+          <h1>{t.areaDetail.notFoundTitle}</h1>
+          <Link className="button button-primary" to="/heatmap">{t.common.backToHeatmap}</Link>
         </section>
       </main>
     );
   }
 
-  const definition = classificationDefinitions[summary.areaRiskGrade];
   const problemRate = `${Math.round(summary.problemRatio * 100)}%`;
 
   return (
     <main className="page-shell wide-page">
-      <AppHeader current="エリア詳細" />
+      <AppHeader current={t.areaDetail.current} />
       <section className="page-header">
         <p className="eyebrow">Area Detail</p>
-        <h1>エリア詳細</h1>
-        <p className="lead">{FIELD_ID} / Lane {TARGET_LANE_NO} / {summary.areaId} / {summary.weekLabel}</p>
+        <h1>{t.areaDetail.title}</h1>
+        <p className="lead">{FIELD_ID} / Lane {TARGET_LANE_NO} / {summary.areaId} / {weekLabel(summary.weekOffset)}</p>
       </section>
 
       <section className="detail-grid">
         <article className="panel target-panel">
-          <h2>基本情報</h2>
+          <h2>{t.areaDetail.basicInfo}</h2>
           <dl className="meta-list stacked">
-            <div><dt>圃場ID</dt><dd>{summary.fieldId}</dd></div>
-            <div><dt>レーン番号</dt><dd>Lane {summary.laneNo}</dd></div>
+            <div><dt>{t.common.fieldId}</dt><dd>{summary.fieldId}</dd></div>
+            <div><dt>{t.common.laneNo}</dt><dd>Lane {summary.laneNo}</dd></div>
             <div><dt>Area ID</dt><dd>{summary.areaId}</dd></div>
-            <div><dt>対象Plant範囲</dt><dd>Plant {String(summary.areaStartPlant).padStart(3, '0')}-{String(summary.areaEndPlant).padStart(3, '0')}</dd></div>
-            <div><dt>選択週</dt><dd>{summary.weekLabel}</dd></div>
+            <div><dt>{t.areaDetail.targetPlantRange}</dt><dd>Plant {String(summary.areaStartPlant).padStart(3, '0')}-{String(summary.areaEndPlant).padStart(3, '0')}</dd></div>
+            <div><dt>{t.areaDetail.selectedWeek}</dt><dd>{weekLabel(summary.weekOffset)}</dd></div>
           </dl>
         </article>
         <article className="panel action-recommendation">
-          <h2>局所対応方針</h2>
-          <RiskBadge grade={summary.areaRiskGrade} label={`${summary.areaRiskGrade}: ${definition.riskLabel}`} />
-          <strong>{summary.recommendedPolicy}</strong>
-          <p>推奨ボトル数: {summary.recommendedBottleCount}本</p>
-          <p className="note-text">推奨であり、最終判断は管理者が行います。</p>
+          <h2>{t.areaDetail.policyTitle}</h2>
+          <RiskBadge grade={summary.areaRiskGrade} label={`${summary.areaRiskGrade}: ${riskLabel(summary.areaRiskGrade)}`} />
+          <strong>{riskPolicy(summary.areaRiskGrade)}</strong>
+          <p>{t.areaDetail.recommendedBottles}: {summary.recommendedBottleCount} {t.common.bottles}</p>
+          <p className="note-text">{t.common.finalDecisionNote}</p>
         </article>
       </section>
 
       <section className="summary-grid">
-        <SummaryCard title="有効写真総数" value={summary.validPhotoCount} />
-        <SummaryCard title="問題写真数" value={summary.problemPhotoCount} tone={summary.problemPhotoCount > 0 ? 'warning' : 'good'} />
-        <SummaryCard title="問題写真率" value={problemRate} tone={summary.problemRatio > 0 ? 'warning' : 'good'} />
-        <SummaryCard title="リスクスコア" value={summary.areaRiskScore} tone={summary.areaRiskGrade === 'A' ? 'danger' : 'default'} />
+        <SummaryCard title={t.areaDetail.validTotal} value={summary.validPhotoCount} />
+        <SummaryCard title={t.areaDetail.problemPhotos} value={summary.problemPhotoCount} tone={summary.problemPhotoCount > 0 ? 'warning' : 'good'} />
+        <SummaryCard title={t.areaDetail.problemRatio} value={problemRate} tone={summary.problemRatio > 0 ? 'warning' : 'good'} />
+        <SummaryCard title={t.areaDetail.riskScore} value={summary.areaRiskScore} tone={summary.areaRiskGrade === 'A' ? 'danger' : 'default'} />
       </section>
 
       <section className="panel image-compare-panel">
-        <h2>元画像・スペクトル画像</h2>
+        <h2>{t.areaDetail.imagesTitle}</h2>
         <div className="image-compare">
           <PhotoPreviewMock
             imagePath={representativePhoto?.sourceImagePath ?? IMAGE_PATHS.original}
-            title="元画像"
-            note="撮影確認に使う通常画像Mock"
+            title={t.areaDetail.sourceImage}
+            note={t.areaDetail.sourceImageNote}
           />
           <PhotoPreviewMock
             imagePath={representativePhoto?.processedImagePath ?? IMAGE_PATHS.spectral}
-            title="スペクトル画像"
-            note="解析後イメージMock"
+            title={t.areaDetail.spectralImage}
+            note={t.areaDetail.spectralImageNote}
           />
         </div>
       </section>
 
       <section className="detail-grid">
         <article className="panel">
-          <h2>防除記録</h2>
+          <h2>{t.areaDetail.treatments}</h2>
           {treatments.length > 0 ? (
             <div className="table-scroll">
               <table className="compact-table">
                 <thead>
                   <tr>
-                    <th>対応日</th>
-                    <th>投入ボトル数</th>
-                    <th>対応メモ</th>
+                    <th>{t.areaDetail.treatedAt}</th>
+                    <th>{t.areaDetail.bottleCount}</th>
+                    <th>{t.areaDetail.treatmentNote}</th>
                   </tr>
                 </thead>
                 <tbody>
                   {treatments.map((treatment) => (
                     <tr key={treatment.id}>
                       <td>{formatDate(new Date(treatment.treatedAt))}</td>
-                      <td>{treatment.bottleCount}本</td>
-                      <td>{treatment.note}</td>
+                      <td>{treatment.bottleCount} {t.common.bottles}</td>
+                      <td>{treatmentNote(treatment.note)}</td>
                     </tr>
                   ))}
                 </tbody>
               </table>
             </div>
           ) : (
-            <p className="note-text">このエリアの防除記録サンプルはありません。</p>
+            <p className="note-text">{t.areaDetail.noTreatments}</p>
           )}
         </article>
         <article className="panel">
-          <h2>リスクグレードとボトル数の時系列</h2>
+          <h2>{t.areaDetail.trendTitle}</h2>
           <AreaTrendChart areaId={summary.areaId} summaries={trendSummaries} />
         </article>
       </section>
 
       <div className="button-row">
-        <Link className="button button-primary" to="/heatmap">Heatmapへ戻る</Link>
-        <Link className="button button-secondary" to="/timeline-heatmap">時間軸Heatmapへ戻る</Link>
+        <Link className="button button-primary" to="/heatmap">{t.common.backToHeatmap}</Link>
+        <Link className="button button-secondary" to="/timeline-heatmap">{t.areaDetail.backToTimeline}</Link>
       </div>
     </main>
   );

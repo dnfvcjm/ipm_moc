@@ -2,11 +2,13 @@ import { Link } from 'react-router-dom';
 import AppHeader from '../components/AppHeader';
 import SummaryCard from '../components/SummaryCard';
 import { AREA_COUNT } from '../data/appConfig';
+import { useI18n } from '../i18n/LanguageContext';
 import { getAreaInfoByPlantIndex } from '../utils/analysis';
 import { formatDate, formatDateTime } from '../utils/format';
 import { createDemoBatchIfNeeded, exportMockJson, getCaptureBatches, getPhotoRecords } from '../utils/storage';
 
 export default function SdCardDataPage() {
+  const { statusLabel, t } = useI18n();
   createDemoBatchIfNeeded();
   const batches = getCaptureBatches();
   const selectedBatch = batches[0];
@@ -24,11 +26,11 @@ export default function SdCardDataPage() {
 
   return (
     <main className="page-shell">
-      <AppHeader current="SDカード保存データ" />
+      <AppHeader current={t.sdCard.current} />
       <section className="page-header">
         <p className="eyebrow">SD Card Mock</p>
-        <h1>SDカード保存データ</h1>
-        <p className="lead">localStorage内の撮影データをSDカード保存Mockとして表示します。</p>
+        <h1>{t.sdCard.title}</h1>
+        <p className="lead">{t.sdCard.lead}</p>
       </section>
       <section className="summary-grid">
         {batches.map((batch) => (
@@ -36,18 +38,18 @@ export default function SdCardDataPage() {
             key={batch.id}
             note={`${batch.fieldId} / Lane ${batch.laneNo} / ${formatDate(new Date(batch.startedAt))}`}
             title={batch.id}
-            value={`${batch.validPhotoCount}枚`}
-            tone={batch.analysisStatus === '解析済み' ? 'good' : 'warning'}
+            value={`${batch.validPhotoCount} ${t.common.photos}`}
+            tone={statusLabel(batch.analysisStatus) === t.common.analyzed ? 'good' : 'warning'}
           />
         ))}
       </section>
       {selectedBatch ? (
         <section className="panel">
-          <h2>選択中バッチの詳細</h2>
+          <h2>{t.sdCard.selectedBatch}</h2>
           <dl className="meta-list stacked compact-meta">
-            <div><dt>バッチID</dt><dd>{selectedBatch.id}</dd></div>
-            <div><dt>撮影日</dt><dd>{formatDateTime(selectedBatch.startedAt)}</dd></div>
-            <div><dt>解析ステータス</dt><dd>{selectedBatch.analysisStatus}</dd></div>
+            <div><dt>Batch ID</dt><dd>{selectedBatch.id}</dd></div>
+            <div><dt>{t.sdCard.capturedDate}</dt><dd>{formatDateTime(selectedBatch.startedAt)}</dd></div>
+            <div><dt>{t.common.analysisStatus}</dt><dd>{statusLabel(selectedBatch.analysisStatus)}</dd></div>
           </dl>
           <div className="area-count-grid">
             {Array.from({ length: AREA_COUNT }, (_, index) => {
@@ -59,7 +61,7 @@ export default function SdCardDataPage() {
                   <span>
                     Plant {String(area.areaStartPlant).padStart(3, '0')}-{String(area.areaEndPlant).padStart(3, '0')}
                   </span>
-                  <em>{count}枚</em>
+                  <em>{count} {t.common.photos}</em>
                 </div>
               );
             })}
@@ -67,9 +69,9 @@ export default function SdCardDataPage() {
         </section>
       ) : null}
       <div className="button-row">
-        <Link className="button button-primary" to="/analysis">未解析データ一覧へ</Link>
-        <button className="button button-secondary" onClick={handleExport} type="button">Mock JSONを書き出し</button>
-        <Link className="button button-ghost" to="/">ホームへ戻る</Link>
+        <Link className="button button-primary" to="/analysis">{t.sdCard.toAnalysis}</Link>
+        <button className="button button-secondary" onClick={handleExport} type="button">{t.sdCard.exportJson}</button>
+        <Link className="button button-ghost" to="/">{t.common.backHome}</Link>
       </div>
     </main>
   );

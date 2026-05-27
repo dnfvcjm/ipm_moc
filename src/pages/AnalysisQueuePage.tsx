@@ -1,76 +1,83 @@
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import AppHeader from '../components/AppHeader';
 import SummaryCard from '../components/SummaryCard';
-import { aggregateAreaRisk, analyzePhotos } from '../utils/analysis';
+import UnanalyzedDataList from '../components/UnanalyzedDataList';
+import { IMAGE_PATHS } from '../data/appConfig';
+import { useI18n } from '../i18n/LanguageContext';
 import {
   createDemoBatchIfNeeded,
   getCaptureBatches,
   getPhotoRecords,
-  saveAnalyzedBatch,
 } from '../utils/storage';
 
+const getBatchPhotos = (batchId: string) =>
+  getPhotoRecords().filter((photo) => photo.batchId === batchId && photo.isValidForAnalysis);
+
+const isAnalyzedBatch = (batchId: string) => {
+  const photos = getBatchPhotos(batchId);
+  return photos.length > 0 && photos.every((photo) => photo.riskScore !== undefined);
+};
+
 export default function AnalysisQueuePage() {
+  const navigate = useNavigate();
+  const { t } = useI18n();
+
   createDemoBatchIfNeeded();
   const batches = getCaptureBatches();
   const photos = getPhotoRecords();
-  const pendingBatches = batches.filter((batch) => batch.analysisStatus === '未解析');
-  const analyzedPhotos = photos.filter((photo) => photo.riskScore !== undefined).length;
+  const pendingBatches = batches.filter((batch) => !isAnalyzedBatch(batch.id));
+  const unanalyzedPhotoCount = pendingBatches.reduce(
+    (total, batch) => total + getBatchPhotos(batch.id).filter((photo) => photo.riskScore === undefined).length,
+    0,
+  );
+  const analyzedPhotoCount = photos.filter((photo) => photo.riskScore !== undefined).length;
 
-  const handleAnalyze = () => {
-    pendingBatches.forEach((batch) => {
-      const batchPhotos = photos.filter((photo) => photo.batchId === batch.id && photo.isValidForAnalysis);
-      const analyzed = analyzePhotos(batchPhotos);
-      const areaRisk = aggregateAreaRisk(analyzed);
-      saveAnalyzedBatch(batch.id, analyzed, areaRisk);
-    });
-    window.location.reload();
+  const handleAnalyze = (batchId: string) => {
+    navigate(`/analysis/${encodeURIComponent(batchId)}`);
   };
 
   return (
-    <main className="page-shell">
-      <AppHeader current="未解析データ一覧" />
+    <main className="page-shell wide-page analysis-queue-page">
+      <AppHeader current={t.analysisQueue.current} />
       <section className="page-header">
         <p className="eyebrow">Analysis Queue</p>
-        <h1>未解析データ一覧</h1>
-        <p className="lead">SDカードMock上の未解析バッチに疑似解析を実行します。</p>
+        <h1>{t.analysisQueue.title}</h1>
+        <p className="lead">
+          {t.analysisQueue.lead}
+        </p>
       </section>
+
       <section className="summary-grid">
-        <SummaryCard title="未解析バッチ数" value={pendingBatches.length} tone="warning" />
-        <SummaryCard title="未解析写真数" value={photos.filter((photo) => photo.riskScore === undefined).length} />
-        <SummaryCard title="解析済み写真数" value={analyzedPhotos} tone="good" />
+        <SummaryCard title={t.analysisQueue.pendingBatchCount} value={pendingBatches.length} tone="warning" />
+        <SummaryCard title={t.analysisQueue.pendingPhotoCount} value={unanalyzedPhotoCount} />
+        <SummaryCard title={t.analysisQueue.analyzedPhotoCount} value={analyzedPhotoCount} tone="good" />
+        <SummaryCard title={t.analysisQueue.analysisTarget} value={`${t.common.tomato} / ${t.common.leaf}`} tone="info" />
       </section>
-      <section className="panel table-panel">
-        <div className="table-scroll">
-          <table>
-            <thead>
-              <tr>
-                <th>バッチID</th>
-                <th>圃場ID</th>
-                <th>レーン番号</th>
-                <th>有効写真数</th>
-                <th>解析ステータス</th>
-              </tr>
-            </thead>
-            <tbody>
-              {batches.map((batch) => (
-                <tr key={batch.id}>
-                  <td>{batch.id}</td>
-                  <td>{batch.fieldId}</td>
-                  <td>Lane {batch.laneNo}</td>
-                  <td>{batch.validPhotoCount}</td>
-                  <td>{batch.analysisStatus}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </section>
+
+      <UnanalyzedDataList
+        batches={pendingBatches.length > 0 ? pendingBatches : batches}
+        onAnalyze={handleAnalyze}
+        photos={photos}
+        thumbnailPath={IMAGE_PATHS.original}
+      />
+
       <div className="button-row">
-        <button className="button button-primary" disabled={pendingBatches.length === 0} onClick={handleAnalyze} type="button">
-          未解析データを解析
-        </button>
-        <Link className="button button-secondary" to="/heatmap">Heatmapを見る</Link>
-        <Link className="button button-ghost" to="/">戻る</Link>
+        {pendingBatches.length > 0 ? (
+          <button
+            className="button button-primary"
+            onClick={() => handleAnalyze(pendingBatches[0].id)}
+            type="button"
+          >
+            {t.analysisQueue.firstAnalyze}
+          </button>
+        ) : (
+          <Link className="button button-primary" to="/heatmap">
+            {t.analysisQueue.viewHeatmap}
+          </Link>
+        )}
+        <Link className="button button-ghost" to="/">
+          {t.common.backHome}
+        </Link>
       </div>
     </main>
   );

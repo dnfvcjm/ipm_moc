@@ -1,4 +1,5 @@
 import type { AreaRiskSummary } from '../types';
+import { useI18n } from '../i18n/LanguageContext';
 import RiskBadge from './RiskBadge';
 
 type AreaHeatmapProps = {
@@ -8,6 +9,8 @@ type AreaHeatmapProps = {
 };
 
 export default function AreaHeatmap({ summaries, onSelectArea, compact = false }: AreaHeatmapProps) {
+  const { t } = useI18n();
+
   return (
     <div className={`area-heatmap ${compact ? 'compact' : ''}`}>
       {summaries.map((summary) => (
@@ -26,7 +29,7 @@ export default function AreaHeatmap({ summaries, onSelectArea, compact = false }
           <strong>
             {summary.problemPhotoCount}/{summary.validPhotoCount}
           </strong>
-          {!compact ? <em>推奨 {summary.recommendedBottleCount}本</em> : null}
+          {!compact ? <em>{t.heatmap.recommendation} {summary.recommendedBottleCount} {t.common.bottles}</em> : null}
         </button>
       ))}
     </div>

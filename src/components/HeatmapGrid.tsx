@@ -1,4 +1,5 @@
 import { LANE_NUMBERS, PLANT_NUMBERS } from '../data/appConfig';
+import { useI18n } from '../i18n/LanguageContext';
 import type { ScoutingRecord } from '../types';
 
 type HeatmapGridProps = {
@@ -28,10 +29,11 @@ const selectDisplayRecords = (records: ScoutingRecord[]) => {
 };
 
 export default function HeatmapGrid({ records, onCellClick }: HeatmapGridProps) {
+  const { t } = useI18n();
   const displayRecords = selectDisplayRecords(records);
 
   return (
-    <div className="heatmap-grid" aria-label="圃場リスクヒートマップ">
+    <div className="heatmap-grid" aria-label={t.heatmap.title}>
       <div className="heatmap-header">
         <span>Lane</span>
         {PLANT_NUMBERS.map((plantNo) => (
@@ -63,7 +65,7 @@ export default function HeatmapGrid({ records, onCellClick }: HeatmapGridProps) 
                 onClick={() => onCellClick(record)}
                 type="button"
               >
-                <strong>{classification ?? '未'}</strong>
+                <strong>{classification ?? '-'}</strong>
                 <span>{scoreLabel}</span>
               </button>
             );

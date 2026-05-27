@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="600" viewBox="0 0 900 600" role="img" aria-label="Blurred leaf camera frame mock">
+  <defs>
+    <filter id="blurred">
+      <feGaussianBlur stdDeviation="14"/>
+    </filter>
+  </defs>
+  <image href="/assets/images/camera-leaf.svg" x="-20" y="-14" width="940" height="628" filter="url(#blurred)" opacity="0.98"/>
+  <rect width="900" height="600" fill="#e9f2dd" opacity="0.1"/>
+</svg>

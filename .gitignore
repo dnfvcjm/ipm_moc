@@ -6,3 +6,8 @@ dist/
 .env.*
 .DS_Store
 .vercel
+
+# Local preview/source duplicates. Runtime assets live under public/.
+/capture-preview.png
+/AdobeStock_159772561-768x512.jpeg
+/c033f113-f253-474d-be29-944804835778.png

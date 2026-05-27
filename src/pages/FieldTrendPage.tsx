@@ -5,6 +5,7 @@ import SummaryCard from '../components/SummaryCard';
 import { FIELD_ID, TARGET_LANE_NO } from '../data/appConfig';
 import { sampleTreatments } from '../data/sampleTreatments';
 import { sampleWeeklyRisk } from '../data/sampleWeeklyRisk';
+import { useI18n } from '../i18n/LanguageContext';
 
 const getAverageScore = (weekOffset: number) => {
   const rows = sampleWeeklyRisk.filter((summary) => summary.weekOffset === weekOffset);
@@ -12,6 +13,7 @@ const getAverageScore = (weekOffset: number) => {
 };
 
 export default function FieldTrendPage() {
+  const { t } = useI18n();
   const currentAverage = Math.round(getAverageScore(0));
   const previousAverage = Math.round(getAverageScore(-1));
   const currentSummaries = sampleWeeklyRisk.filter((summary) => summary.weekOffset === 0);
@@ -29,26 +31,26 @@ export default function FieldTrendPage() {
 
   return (
     <main className="page-shell">
-      <AppHeader current="全体リスク推移" />
+      <AppHeader current={t.fieldTrend.current} />
       <section className="page-header">
         <p className="eyebrow">Field Trend</p>
-        <h1>全体リスク推移</h1>
-        <p className="lead">対象: {FIELD_ID} / Lane {TARGET_LANE_NO}</p>
+        <h1>{t.fieldTrend.title}</h1>
+        <p className="lead">{t.common.target}: {FIELD_ID} / Lane {TARGET_LANE_NO}</p>
       </section>
       <section className="summary-grid">
-        <SummaryCard title="今週の平均リスク" value={currentAverage} />
-        <SummaryCard title="前週との差分" value={currentAverage - previousAverage} tone={currentAverage > previousAverage ? 'danger' : 'good'} />
-        <SummaryCard title="高リスクエリア数" value={highRiskCount} tone="danger" />
-        <SummaryCard title="改善エリア数" value={improvedCount} tone="good" />
-        <SummaryCard title="悪化エリア数" value={worsenedCount} tone="warning" />
-        <SummaryCard title="防除ボトル数合計" value={`${bottleTotal}本`} tone="info" />
+        <SummaryCard title={t.fieldTrend.currentAverage} value={currentAverage} />
+        <SummaryCard title={t.fieldTrend.difference} value={currentAverage - previousAverage} tone={currentAverage > previousAverage ? 'danger' : 'good'} />
+        <SummaryCard title={t.fieldTrend.highRiskAreas} value={highRiskCount} tone="danger" />
+        <SummaryCard title={t.fieldTrend.improvedAreas} value={improvedCount} tone="good" />
+        <SummaryCard title={t.fieldTrend.worsenedAreas} value={worsenedCount} tone="warning" />
+        <SummaryCard title={t.fieldTrend.bottleTotal} value={`${bottleTotal} ${t.common.bottles}`} tone="info" />
       </section>
       <section className="panel">
-        <h2>5週前から今週までの推移</h2>
+        <h2>{t.fieldTrend.chartTitle}</h2>
         <FieldTrendChart summaries={sampleWeeklyRisk} />
       </section>
       <div className="button-row">
-        <Link className="button button-primary" to="/heatmap">エリア別Heatmapへ戻る</Link>
+        <Link className="button button-primary" to="/heatmap">{t.timelineHeatmap.backToAreaHeatmap}</Link>
       </div>
     </main>
   );

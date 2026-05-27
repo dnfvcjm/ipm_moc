@@ -5,9 +5,11 @@ import RiskBadge from '../components/RiskBadge';
 import SummaryCard from '../components/SummaryCard';
 import { WEEK_OPTIONS } from '../data/appConfig';
 import { sampleWeeklyRisk } from '../data/sampleWeeklyRisk';
+import { useI18n } from '../i18n/LanguageContext';
 
 export default function TimelineHeatmapPage() {
   const navigate = useNavigate();
+  const { t, weekLabel } = useI18n();
   const areaIds = Array.from(new Set(sampleWeeklyRisk.map((summary) => summary.areaId)));
   const improving = areaIds.filter((areaId) => {
     const first = sampleWeeklyRisk.find((summary) => summary.areaId === areaId && summary.weekOffset === -5);
@@ -25,20 +27,20 @@ export default function TimelineHeatmapPage() {
 
   return (
     <main className="page-shell wide-page">
-      <AppHeader current="時間軸Heatmap" />
+      <AppHeader current={t.timelineHeatmap.current} />
       <section className="page-header">
         <p className="eyebrow">Timeline Heatmap</p>
-        <h1>時間軸Heatmap</h1>
+        <h1>{t.timelineHeatmap.title}</h1>
       </section>
       <section className="summary-grid">
-        <SummaryCard title="改善しているエリア" value={improving.join(', ') || '-'} tone="good" />
-        <SummaryCard title="拡大傾向のエリア" value={worsening.join(', ') || '-'} tone="danger" />
-        <SummaryCard title="継続して高リスク" value={continuousHigh.join(', ') || '-'} tone="warning" />
+        <SummaryCard title={t.timelineHeatmap.improvingAreas} value={improving.join(', ') || '-'} tone="good" />
+        <SummaryCard title={t.timelineHeatmap.worseningAreas} value={worsening.join(', ') || '-'} tone="danger" />
+        <SummaryCard title={t.timelineHeatmap.continuousHigh} value={continuousHigh.join(', ') || '-'} tone="warning" />
       </section>
       <section className="panel timeline-heatmap-panel">
         <div className="timeline-heatmap">
           <div className="timeline-head">Area</div>
-          {WEEK_OPTIONS.map((week) => <div className="timeline-head" key={week.weekOffset}>{week.weekLabel}</div>)}
+          {WEEK_OPTIONS.map((week) => <div className="timeline-head" key={week.weekOffset}>{weekLabel(week.weekOffset)}</div>)}
           {areaIds.map((areaId) => (
             <Fragment key={areaId}>
               <div className="timeline-area-label">{areaId}</div>
@@ -60,7 +62,7 @@ export default function TimelineHeatmapPage() {
         </div>
       </section>
       <div className="button-row">
-        <Link className="button button-primary" to="/heatmap">エリア別Heatmapへ戻る</Link>
+        <Link className="button button-primary" to="/heatmap">{t.timelineHeatmap.backToAreaHeatmap}</Link>
       </div>
     </main>
   );

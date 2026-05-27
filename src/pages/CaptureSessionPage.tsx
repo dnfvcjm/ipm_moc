@@ -1,10 +1,11 @@
 import { useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import AppHeader from '../components/AppHeader';
-import PhotoPreviewMock from '../components/PhotoPreviewMock';
+import CameraLivePreview from '../components/CameraLivePreview';
 import ProgressBar from '../components/ProgressBar';
 import SummaryCard from '../components/SummaryCard';
 import { IMAGE_PATHS, STORAGE_LABEL, TARGET_PLANT_COUNT } from '../data/appConfig';
+import { useI18n } from '../i18n/LanguageContext';
 import { getAreaInfoByPlantIndex, shouldShowBlurredImage } from '../utils/analysis';
 import {
   createImageId,
@@ -18,6 +19,7 @@ import {
 
 export default function CaptureSessionPage() {
   const navigate = useNavigate();
+  const { t } = useI18n();
   const [isCapturing, setIsCapturing] = useState(false);
   const [savedMessage, setSavedMessage] = useState('');
   const session = getCaptureSession() ?? startNewCaptureSession();
@@ -44,64 +46,70 @@ export default function CaptureSessionPage() {
       });
       setIsCapturing(false);
       navigate('/blur-check');
-    }, 650);
+    }, 850);
   };
 
   const handlePause = () => {
     saveCaptureSession(session);
-    setSavedMessage('撮影セッションを一時保存しました');
+    setSavedMessage(t.capture.pauseSaved);
   };
 
   return (
     <main className="page-shell capture-page">
-      <AppHeader current="撮影セッション" />
+      <AppHeader current={t.capture.current} />
       <section className="page-header">
-        <p className="eyebrow">Capture Session</p>
-        <h1>Lane {session.laneNo} 撮影セッション</h1>
-        <p className="lead">Plant Indexはアプリが自動進行します。株番号の手入力はありません。</p>
+        <p className="eyebrow">{t.capture.eyebrow}</p>
+        <h1>Lane {session.laneNo} {t.capture.titleSuffix}</h1>
+        <p className="lead">
+          {t.capture.lead}
+        </p>
       </section>
 
       <section className="summary-grid">
-        <SummaryCard title="有効写真数" value={validPhotoCount} note="解析対象" tone="good" />
-        <SummaryCard title="再撮影回数" value={session.totalBlurredRetakeCount} tone="warning" />
+        <SummaryCard title={t.capture.validPhotos} value={validPhotoCount} note={t.capture.analysisTarget} tone="good" />
+        <SummaryCard title={t.capture.retakes} value={session.totalBlurredRetakeCount} tone="warning" />
         <SummaryCard
-          title="現在のArea"
+          title={t.capture.currentArea}
           value={areaInfo.areaId}
           note={`Plant ${String(areaInfo.areaStartPlant).padStart(3, '0')}-${String(areaInfo.areaEndPlant).padStart(3, '0')}`}
         />
-        <SummaryCard title="保存先" value={STORAGE_LABEL} tone="info" />
+        <SummaryCard title={t.capture.storage} value={t.common.sdCardMock || STORAGE_LABEL} tone="info" />
       </section>
 
       <section className="panel">
         <ProgressBar current={plantIndex} total={TARGET_PLANT_COUNT} />
         <div className="capture-layout">
-          <PhotoPreviewMock
+          <CameraLivePreview
             imagePath={isBlurred ? IMAGE_PATHS.blurred : IMAGE_PATHS.original}
             isBlurred={isBlurred}
-            note={isBlurred ? 'このPlantは初回のみピンボケMockが出ます' : '撮影プレビューMock'}
-            title="元画像プレビュー"
+            isCapturing={isCapturing}
+            plantIndex={plantIndex}
           />
           <aside className="guide-panel">
-            <h2>撮影ガイド</h2>
+            <h2>{t.capture.guideTitle}</h2>
             <ul className="check-list">
-              <li>成長点の1段下の葉を撮影してください</li>
-              <li>葉が画面中央に入るようにしてください</li>
-              <li>ピンボケしないように距離を一定にしてください</li>
-              <li>撮影後、高所台車の足操作で隣の株へ移動してください</li>
+              {t.capture.guide.map((item) => (
+                <li key={item}>{item}</li>
+              ))}
             </ul>
-            {pending ? <p className="note-text">未確認の撮影があります。ピンボケ確認へ進んでください。</p> : null}
+            {pending ? <p className="note-text">{t.capture.pendingNotice}</p> : null}
           </aside>
         </div>
         {savedMessage ? <div className="toast-message">{savedMessage}</div> : null}
         <div className="button-row">
-          <button className="button button-primary button-large" disabled={isCapturing} onClick={handleCapture} type="button">
-            {isCapturing ? '撮影中...' : '撮影する'}
+          <button
+            className="button button-primary button-large capture-shutter-action"
+            disabled={isCapturing}
+            onClick={handleCapture}
+            type="button"
+          >
+            {isCapturing ? t.capture.capturing : t.capture.shutter}
           </button>
           <button className="button button-secondary" onClick={handlePause} type="button">
-            一時保存して中断
+            {t.capture.pause}
           </button>
           <Link className="button button-ghost" to="/">
-            ホームへ戻る
+            {t.common.backHome}
           </Link>
         </div>
       </section>

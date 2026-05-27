@@ -1,4 +1,5 @@
 import { WEEK_OPTIONS } from '../data/appConfig';
+import { useI18n } from '../i18n/LanguageContext';
 
 type TimelineSliderProps = {
   value: number;
@@ -6,6 +7,7 @@ type TimelineSliderProps = {
 };
 
 export default function TimelineSlider({ value, onChange }: TimelineSliderProps) {
+  const { t, weekLabel } = useI18n();
   const index = WEEK_OPTIONS.findIndex((week) => week.weekOffset === value);
 
   return (
@@ -16,14 +18,14 @@ export default function TimelineSlider({ value, onChange }: TimelineSliderProps)
             className={week.weekOffset === value ? 'active' : ''}
             key={week.weekOffset}
             onClick={() => onChange(week.weekOffset)}
-            type="button"
-          >
-            {week.weekLabel}
+          type="button"
+        >
+            {weekLabel(week.weekOffset)}
           </button>
         ))}
       </div>
       <input
-        aria-label="週の切り替え"
+        aria-label={t.timelineHeatmap.title}
         max={WEEK_OPTIONS.length - 1}
         min={0}
         onChange={(event) => onChange(WEEK_OPTIONS[Number(event.target.value)].weekOffset)}

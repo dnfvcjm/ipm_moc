@@ -1,62 +1,56 @@
 import { Link } from 'react-router-dom';
 import AppHeader from '../components/AppHeader';
+import LanguageToggle from '../components/LanguageToggle';
 import { FIELD_ID, SHOOTING_POSITION, TARGET_LANE_NO, TARGET_PLANT_COUNT } from '../data/appConfig';
-
-const cards = [
-  '圃場確認',
-  'レーンQR',
-  '80株撮影',
-  'ピンボケ確認',
-  'SDカード保存',
-  '解析',
-  '5mエリアHeatmap',
-  '防除効果確認',
-];
+import { useI18n } from '../i18n/LanguageContext';
 
 export default function HomePage() {
+  const { t } = useI18n();
+
   return (
     <main className="page-shell">
-      <AppHeader current="ホーム" />
+      <AppHeader current={t.home.current} />
       <section className="hero-panel">
         <div>
-          <p className="eyebrow">Field Scouting Mock</p>
-          <h1>DN IPM Spectral Scouting Mock</h1>
-          <p className="lead">レーン撮影・SDカード保存・エリア別リスク可視化モック</p>
+          <p className="eyebrow">{t.home.eyebrow}</p>
+          <h1>{t.common.appName}</h1>
+          <p className="lead">{t.home.subtitle}</p>
+          <LanguageToggle />
         </div>
         <div className="hero-actions">
           <Link className="button button-primary button-large" to="/assignment">
-            今日の圃場を確認
+            {t.home.confirmField}
           </Link>
           <Link className="button button-secondary button-large" to="/analysis">
-            解析・Heatmapを見る
+            {t.home.viewAnalysis}
           </Link>
         </div>
       </section>
 
       <section className="info-grid">
         <article className="panel target-panel">
-          <h2>今日の対象</h2>
+          <h2>{t.home.todayTarget}</h2>
           <dl className="meta-list stacked">
             <div>
-              <dt>圃場ID</dt>
+              <dt>{t.common.fieldId}</dt>
               <dd>{FIELD_ID}</dd>
             </div>
             <div>
-              <dt>対象レーン</dt>
+              <dt>{t.common.targetLane}</dt>
               <dd>Lane {TARGET_LANE_NO}</dd>
             </div>
             <div>
-              <dt>撮影株数</dt>
-              <dd>{TARGET_PLANT_COUNT}株</dd>
+              <dt>{t.home.targetPlantCount}</dt>
+              <dd>{TARGET_PLANT_COUNT} {t.common.plants}</dd>
             </div>
             <div>
-              <dt>撮影位置</dt>
-              <dd>{SHOOTING_POSITION}</dd>
+              <dt>{t.assignment.shootingPosition}</dt>
+              <dd>{t.common.shootingPosition || SHOOTING_POSITION}</dd>
             </div>
           </dl>
         </article>
         <div className="flow-grid dense">
-          {cards.map((card, index) => (
+          {t.home.cards.map((card, index) => (
             <article className="flow-card" key={card}>
               <span>{String(index + 1).padStart(2, '0')}</span>
               <h3>{card}</h3>

@@ -1,4 +1,5 @@
 import type { AnalysisStatus, Classification } from '../types';
+import { useI18n } from '../i18n/LanguageContext';
 
 type StatusBadgeProps = {
   status?: AnalysisStatus;
@@ -6,9 +7,15 @@ type StatusBadgeProps = {
 };
 
 export default function StatusBadge({ status, classification }: StatusBadgeProps) {
-  const label = classification ?? status ?? '-';
+  const { statusLabel, t } = useI18n();
+  const translatedStatus = statusLabel(status);
+  const label = classification ?? translatedStatus;
   const statusClass =
-    status === '解析済み' ? 'analyzed' : status === '解析中' ? 'analyzing' : 'pending';
+    translatedStatus === t.common.analyzed
+      ? 'analyzed'
+      : translatedStatus === t.common.analyzing
+        ? 'analyzing'
+        : 'pending';
   const className = classification
     ? `badge badge-class-${classification}`
     : `badge badge-status-${statusClass}`;
