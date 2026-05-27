@@ -2601,3 +2601,509 @@ tbody tr:hover {
     padding: 9px 7px;
   }
 }
+
+@media (orientation: landscape) and (max-height: 520px) and (max-width: 980px) {
+  html {
+    min-height: 100%;
+  }
+
+  body {
+    overflow-x: hidden;
+  }
+
+  .page-shell,
+  .narrow-page,
+  .capture-page,
+  .wide-page {
+    width: 100%;
+    min-height: 100dvh;
+    padding: 8px 12px calc(96px + env(safe-area-inset-bottom));
+  }
+
+  .app-header {
+    align-items: center;
+    flex-direction: row;
+    gap: 8px;
+    margin-bottom: 8px;
+  }
+
+  .brand-link {
+    gap: 7px;
+  }
+
+  .brand-link span {
+    padding: 4px 7px;
+    font-size: 0.72rem;
+  }
+
+  .brand-link strong,
+  .header-current {
+    font-size: 0.78rem;
+  }
+
+  .header-current {
+    padding: 5px 8px;
+  }
+
+  .page-header {
+    margin-bottom: 8px;
+  }
+
+  .page-header .lead,
+  .hero-panel .lead {
+    display: none;
+  }
+
+  .eyebrow {
+    margin-bottom: 4px;
+    font-size: 0.68rem;
+  }
+
+  h1 {
+    margin-bottom: 6px;
+    font-size: 1.28rem;
+    line-height: 1.15;
+  }
+
+  h2 {
+    margin-bottom: 8px;
+    font-size: 0.98rem;
+  }
+
+  h3 {
+    margin-bottom: 4px;
+    font-size: 0.86rem;
+  }
+
+  .lead,
+  .note-text {
+    font-size: 0.82rem;
+    line-height: 1.35;
+  }
+
+  .hero-panel {
+    grid-template-columns: minmax(0, 1fr) minmax(210px, 0.54fr);
+    gap: 12px;
+    align-items: center;
+    min-height: calc(100dvh - 28px);
+    padding: 12px;
+  }
+
+  .hero-panel h1 {
+    font-size: 1.35rem;
+  }
+
+  .language-toggle {
+    width: auto;
+    margin-top: 10px;
+    padding: 6px;
+  }
+
+  .language-toggle span {
+    font-size: 0.7rem;
+  }
+
+  .language-toggle button {
+    min-height: 31px;
+    padding: 5px 8px;
+    font-size: 0.78rem;
+  }
+
+  .hero-actions {
+    gap: 8px;
+  }
+
+  .info-grid {
+    grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+    gap: 10px;
+    margin-top: 10px;
+  }
+
+  .target-panel,
+  .action-panel,
+  .toolbar-panel,
+  .table-panel,
+  .legend-panel,
+  .heatmap-panel,
+  .memo-panel,
+  .menu-card,
+  .panel {
+    padding: 10px;
+  }
+
+  .flow-grid,
+  .flow-grid.dense {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 8px;
+  }
+
+  .flow-card,
+  .flow-grid.dense .flow-card {
+    min-height: auto;
+    padding: 9px;
+  }
+
+  .flow-card span {
+    width: 24px;
+    height: 24px;
+    margin-bottom: 6px;
+    font-size: 0.72rem;
+  }
+
+  .summary-grid,
+  .result-card-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 8px;
+  }
+
+  .summary-card {
+    min-height: 62px;
+    padding: 8px;
+  }
+
+  .summary-card p {
+    margin-bottom: 4px;
+    font-size: 0.68rem;
+  }
+
+  .summary-card strong {
+    font-size: 1rem;
+  }
+
+  .summary-card span {
+    display: none;
+  }
+
+  .button,
+  .button-row .button {
+    width: 100%;
+    min-height: 42px;
+    padding: 8px 10px;
+    font-size: 0.84rem;
+  }
+
+  .button-large {
+    min-height: 44px;
+    font-size: 0.9rem;
+  }
+
+  .page-shell > .button-row,
+  .page-shell > .analysis-result-actions,
+  .panel > .button-row,
+  .action-panel > .button-row {
+    position: fixed;
+    z-index: 90;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 8px;
+    max-height: 88px;
+    margin: 0;
+    padding: 8px 12px calc(8px + env(safe-area-inset-bottom));
+    border-top: 1px solid rgba(221, 231, 225, 0.92);
+    background: rgba(255, 255, 255, 0.97);
+    box-shadow: 0 -10px 24px rgba(27, 62, 45, 0.12);
+    overflow: visible;
+    backdrop-filter: blur(12px);
+  }
+
+  .unanalyzed-card .button-row,
+  .hero-actions,
+  .vertical-actions {
+    position: static;
+    display: grid;
+    grid-template-columns: 1fr;
+    max-height: none;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    box-shadow: none;
+    overflow: visible;
+    backdrop-filter: none;
+  }
+
+  .meta-list,
+  .mini-meta-grid {
+    gap: 8px;
+  }
+
+  .meta-list div,
+  .meta-list.stacked div {
+    grid-template-columns: 122px 1fr;
+    gap: 8px;
+    padding: 7px 0;
+  }
+
+  .meta-list dt,
+  .mini-meta-grid dt {
+    font-size: 0.72rem;
+  }
+
+  .meta-list dd,
+  .mini-meta-grid dd {
+    font-size: 0.82rem;
+  }
+
+  .check-list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 6px;
+  }
+
+  .check-list li {
+    padding: 7px 9px;
+    font-size: 0.76rem;
+    line-height: 1.25;
+  }
+
+  .qr-mock {
+    width: min(100%, 210px);
+    margin: 8px auto;
+    padding: 10px;
+  }
+
+  .qr-grid {
+    width: 92px;
+    border-width: 6px;
+  }
+
+  .progress-wrap {
+    margin-bottom: 8px;
+  }
+
+  .capture-layout,
+  .confirm-layout {
+    grid-template-columns: minmax(0, 1.12fr) minmax(220px, 0.88fr);
+    gap: 10px;
+    align-items: start;
+  }
+
+  .camera-live-preview {
+    width: 100%;
+    min-height: 190px;
+    height: min(52dvh, 250px);
+    aspect-ratio: 16 / 9;
+  }
+
+  .camera-guide-text {
+    top: 40px;
+    width: min(86%, 300px);
+    padding: 6px 8px;
+    font-size: 0.72rem;
+  }
+
+  .camera-status-bar,
+  .camera-bottom-bar {
+    right: 8px;
+    left: 8px;
+    min-height: 28px;
+    padding: 5px 7px;
+    font-size: 0.64rem;
+  }
+
+  .camera-status-bar {
+    top: 8px;
+  }
+
+  .camera-bottom-bar {
+    bottom: 8px;
+  }
+
+  .focus-reticle {
+    width: min(210px, 54%);
+  }
+
+  .guide-panel {
+    max-height: min(52dvh, 250px);
+    overflow-y: auto;
+  }
+
+  .guide-panel h2 {
+    margin-bottom: 6px;
+  }
+
+  .guide-panel .check-list {
+    grid-template-columns: 1fr;
+  }
+
+  .photo-preview img,
+  .mock-image img {
+    max-height: min(52dvh, 250px);
+    object-fit: contain;
+  }
+
+  .photo-preview figcaption {
+    padding: 8px 10px;
+  }
+
+  .confirm-layout .panel-subtle {
+    max-height: min(52dvh, 250px);
+    overflow-y: auto;
+  }
+
+  .analysis-loading-card {
+    min-height: calc(100dvh - 88px);
+    gap: 8px;
+    padding: 14px;
+  }
+
+  .analysis-spinner {
+    width: 44px;
+    height: 44px;
+    border-width: 5px;
+  }
+
+  .analysis-steps {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 7px;
+  }
+
+  .analysis-steps li {
+    padding: 8px;
+    font-size: 0.74rem;
+  }
+
+  .before-after-grid,
+  .image-compare {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+  }
+
+  .analysis-image-card {
+    gap: 8px;
+    padding: 8px;
+  }
+
+  .analysis-image-wrap img {
+    max-height: min(42dvh, 200px);
+    object-fit: contain;
+  }
+
+  .analysis-image-wrap:not(.spectral-wrap) img {
+    object-fit: cover;
+  }
+
+  .analysis-annotations {
+    gap: 5px;
+  }
+
+  .analysis-annotations span {
+    padding: 5px 7px;
+    font-size: 0.66rem;
+  }
+
+  .result-card-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .result-detection-card {
+    padding: 8px;
+  }
+
+  .result-detection-card p,
+  .analysis-result-summary .note-text,
+  .unanalyzed-body .note-text {
+    display: none;
+  }
+
+  .unanalyzed-card {
+    grid-template-columns: minmax(190px, 0.4fr) minmax(0, 0.6fr);
+  }
+
+  .unanalyzed-thumb {
+    min-height: 150px;
+    max-height: 190px;
+  }
+
+  .unanalyzed-body {
+    gap: 8px;
+    padding: 10px;
+  }
+
+  .unanalyzed-card-head {
+    align-items: start;
+    gap: 6px;
+  }
+
+  .area-count-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 7px;
+  }
+
+  .area-count {
+    padding: 7px;
+    font-size: 0.74rem;
+  }
+
+  .timeline-labels {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: 6px;
+  }
+
+  .timeline-labels button {
+    min-height: 32px;
+    padding: 5px;
+    font-size: 0.72rem;
+  }
+
+  .area-heatmap,
+  .area-heatmap.compact {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: 6px;
+  }
+
+  .area-cell {
+    min-height: 74px;
+    padding: 7px;
+    font-size: 0.7rem;
+  }
+
+  .area-cell strong {
+    font-size: 0.86rem;
+  }
+
+  .timeline-heatmap-panel {
+    overflow-x: hidden;
+  }
+
+  .timeline-heatmap {
+    grid-template-columns: 54px repeat(6, minmax(0, 1fr));
+    gap: 3px;
+    min-width: 0;
+  }
+
+  .timeline-head,
+  .timeline-area-label,
+  .timeline-cell {
+    min-height: 28px;
+    padding: 2px;
+    font-size: 0.6rem;
+  }
+
+  .timeline-cell .risk-badge {
+    min-width: 28px;
+    min-height: 22px;
+    padding: 2px 5px;
+    font-size: 0.64rem;
+  }
+
+  .trend-chart,
+  .field-trend-chart {
+    min-height: 180px;
+  }
+
+  .trend-column,
+  .field-trend-column {
+    min-height: 164px;
+  }
+
+  .trend-bars,
+  .field-trend-bars {
+    height: 96px;
+  }
+
+  .table-scroll {
+    overflow-x: visible;
+  }
+}
