@@ -32,17 +32,25 @@ export default function LaneQrScanPage() {
           </div>
         ) : null}
         <div className="button-row">
-          <button className="button button-primary button-large" onClick={() => setScanned(true)} type="button">
-            {t.laneQr.scan}
-          </button>
           {scanned ? (
-            <button className="button button-secondary button-large" onClick={startCapture} type="button">
-              {t.laneQr.startCapture}
-            </button>
-          ) : null}
-          <Link className="button button-ghost" to="/assignment">
-            {t.common.back}
-          </Link>
+            <>
+              <button className="button button-primary button-large" onClick={startCapture} type="button">
+                {t.laneQr.startCapture}
+              </button>
+              <Link className="button button-ghost" to="/assignment">
+                {t.common.back}
+              </Link>
+            </>
+          ) : (
+            <>
+              <button className="button button-primary button-large" onClick={() => setScanned(true)} type="button">
+                {t.laneQr.scan}
+              </button>
+              <Link className="button button-ghost" to="/assignment">
+                {t.common.back}
+              </Link>
+            </>
+          )}
         </div>
       </section>
     </main>

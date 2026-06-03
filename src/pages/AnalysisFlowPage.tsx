@@ -3,6 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import AnalysisLoading from '../components/AnalysisLoading';
 import AnalysisResult from '../components/AnalysisResult';
 import AppHeader from '../components/AppHeader';
+import { IMAGE_PATHS } from '../data/appConfig';
 import { useI18n } from '../i18n/LanguageContext';
 import type { CaptureBatch, PhotoRecord } from '../types';
 import { aggregateAreaRisk, analyzePhotos } from '../utils/analysis';
@@ -14,7 +15,6 @@ import {
 } from '../utils/storage';
 
 const SPECTRAL_ANALYSIS_IMAGE = '/images/c033f113-f253-474d-be29-944804835778.png';
-const ANALYSIS_BEFORE_IMAGE = '/images/AdobeStock_159772561-768x512.jpeg';
 
 const findBatch = (batchId?: string) => {
   createDemoBatchIfNeeded();
@@ -95,7 +95,7 @@ export default function AnalysisFlowPage() {
           <AnalysisResult
             afterImagePath={SPECTRAL_ANALYSIS_IMAGE}
             batch={batch}
-            beforeImagePath={ANALYSIS_BEFORE_IMAGE}
+            beforeImagePath={IMAGE_PATHS.original}
             samplePhoto={samplePhoto}
           />
         )

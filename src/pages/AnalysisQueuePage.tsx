@@ -1,14 +1,21 @@
+import { useEffect, useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import AnalysisLoading from '../components/AnalysisLoading';
 import AppHeader from '../components/AppHeader';
 import SummaryCard from '../components/SummaryCard';
 import UnanalyzedDataList from '../components/UnanalyzedDataList';
 import { IMAGE_PATHS } from '../data/appConfig';
 import { useI18n } from '../i18n/LanguageContext';
+import type { CaptureBatch } from '../types';
+import { aggregateAreaRisk, analyzePhotos } from '../utils/analysis';
 import {
   createDemoBatchIfNeeded,
   getCaptureBatches,
   getPhotoRecords,
+  saveAnalyzedBatch,
 } from '../utils/storage';
+
+const ANALYSIS_LOADING_MS = 1600;
 
 const getBatchPhotos = (batchId: string) =>
   getPhotoRecords().filter((photo) => photo.batchId === batchId && photo.isValidForAnalysis);
@@ -21,6 +28,8 @@ const isAnalyzedBatch = (batchId: string) => {
 export default function AnalysisQueuePage() {
   const navigate = useNavigate();
   const { t } = useI18n();
+  const [analyzingBatch, setAnalyzingBatch] = useState<CaptureBatch | null>(null);
+  const analysisTimerRef = useRef<number | null>(null);
 
   createDemoBatchIfNeeded();
   const batches = getCaptureBatches();
@@ -32,9 +41,55 @@ export default function AnalysisQueuePage() {
   );
   const analyzedPhotoCount = photos.filter((photo) => photo.riskScore !== undefined).length;
 
-  const handleAnalyze = (batchId: string) => {
-    navigate(`/analysis/${encodeURIComponent(batchId)}`);
+  useEffect(
+    () => () => {
+      if (analysisTimerRef.current !== null) {
+        window.clearTimeout(analysisTimerRef.current);
+      }
+    },
+    [],
+  );
+
+  const runMockAnalysisAndSave = (batchId: string) => {
+    const targetBatch = getCaptureBatches().find((batch) => batch.id === batchId) ?? null;
+    const targetPhotos = getPhotoRecords().filter(
+      (photo) => photo.batchId === batchId && photo.isValidForAnalysis,
+    );
+    const analyzedPhotos = analyzePhotos(targetPhotos);
+    const areaRiskSummaries = aggregateAreaRisk(analyzedPhotos);
+    saveAnalyzedBatch(batchId, analyzedPhotos, areaRiskSummaries);
+
+    return targetBatch;
   };
+
+  const navigateToHeatmapAfterLoading = () => {
+    if (analysisTimerRef.current !== null) {
+      window.clearTimeout(analysisTimerRef.current);
+    }
+
+    analysisTimerRef.current = window.setTimeout(() => {
+      navigate('/heatmap');
+    }, ANALYSIS_LOADING_MS);
+  };
+
+  const handleAnalyze = (batchId: string) => {
+    if (analyzingBatch) return;
+
+    const targetBatch = runMockAnalysisAndSave(batchId);
+    if (!targetBatch) return;
+
+    setAnalyzingBatch(targetBatch);
+    navigateToHeatmapAfterLoading();
+  };
+
+  if (analyzingBatch) {
+    return (
+      <main className="page-shell wide-page analysis-queue-page">
+        <AppHeader current={t.analysisResult.currentLoading} />
+        <AnalysisLoading batch={analyzingBatch} />
+      </main>
+    );
+  }
 
   return (
     <main className="page-shell wide-page analysis-queue-page">

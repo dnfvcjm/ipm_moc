@@ -8,7 +8,7 @@ type TomatoLeafPreviewProps = {
 };
 
 export default function TomatoLeafPreview({
-  imageSrc = '/images/tomato-leaf.jpg',
+  imageSrc = '/images/capture-leaf-preview.png',
   fallbackSrc,
   isBlurred = false,
 }: TomatoLeafPreviewProps) {

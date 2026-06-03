@@ -9,7 +9,8 @@ import { sampleTreatments } from '../data/sampleTreatments';
 import { sampleWeeklyRisk } from '../data/sampleWeeklyRisk';
 import { useI18n } from '../i18n/LanguageContext';
 import { formatDate } from '../utils/format';
-import { getCurrentAreaRiskSummaries, getPhotoRecords } from '../utils/storage';
+import { getSpectralDetectionMarkers } from '../utils/spectralMarkers';
+import { getCurrentAreaRiskSummaries } from '../utils/storage';
 
 const getSelectedSummary = (areaId: string, weekOffset: number) => {
   const current = getCurrentAreaRiskSummaries();
@@ -32,8 +33,6 @@ export default function AreaDetailPage() {
     .filter((item) => item.areaId === decodedAreaId)
     .sort((a, b) => a.weekOffset - b.weekOffset);
   const treatments = sampleTreatments.filter((treatment) => treatment.areaId === decodedAreaId);
-  const areaPhotos = getPhotoRecords().filter((photo) => photo.areaId === decodedAreaId && photo.isValidForAnalysis);
-  const representativePhoto = areaPhotos.find((photo) => photo.processedImagePath) ?? areaPhotos[0];
 
   if (!summary) {
     return (
@@ -48,6 +47,12 @@ export default function AreaDetailPage() {
   }
 
   const problemRate = `${Math.round(summary.problemRatio * 100)}%`;
+  const spectralMarkers = getSpectralDetectionMarkers({
+    grade: summary.areaRiskGrade,
+    problemRatio: summary.problemRatio,
+    riskScore: summary.areaRiskScore,
+    seed: `${summary.areaId}-${summary.weekOffset}`,
+  });
 
   return (
     <main className="page-shell wide-page">
@@ -89,14 +94,16 @@ export default function AreaDetailPage() {
         <h2>{t.areaDetail.imagesTitle}</h2>
         <div className="image-compare">
           <PhotoPreviewMock
-            imagePath={representativePhoto?.sourceImagePath ?? IMAGE_PATHS.original}
+            imagePath={IMAGE_PATHS.original}
             title={t.areaDetail.sourceImage}
             note={t.areaDetail.sourceImageNote}
           />
           <PhotoPreviewMock
-            imagePath={representativePhoto?.processedImagePath ?? IMAGE_PATHS.spectral}
+            imagePath={IMAGE_PATHS.spectral}
+            markers={spectralMarkers}
             title={t.areaDetail.spectralImage}
             note={t.areaDetail.spectralImageNote}
+            variant="spectral"
           />
         </div>
       </section>

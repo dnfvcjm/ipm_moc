@@ -1,22 +1,28 @@
+import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import AppHeader from '../components/AppHeader';
 import PhotoPreviewMock from '../components/PhotoPreviewMock';
-import { IMAGE_PATHS, TARGET_PLANT_COUNT } from '../data/appConfig';
+import SummaryCard from '../components/SummaryCard';
+import { IMAGE_PATHS, STORAGE_LABEL, TARGET_PLANT_COUNT } from '../data/appConfig';
 import { useI18n } from '../i18n/LanguageContext';
-import { getAreaInfoByPlantIndex } from '../utils/analysis';
+import { getAreaInfoByPlantIndex, shouldShowBlurredImage } from '../utils/analysis';
 import { formatDateTime } from '../utils/format';
 import {
   completeCaptureBatch,
+  createImageId,
   getCaptureSession,
   getPendingCapture,
+  getValidPhotosByBatch,
   incrementRetakeForPlant,
   saveCaptureSession,
+  savePendingCapture,
   saveValidPhoto,
 } from '../utils/storage';
 
 export default function BlurCheckPage() {
   const navigate = useNavigate();
   const { t } = useI18n();
+  const [, setNavigationVersion] = useState(0);
   const session = getCaptureSession();
   const pending = getPendingCapture();
 
@@ -36,6 +42,29 @@ export default function BlurCheckPage() {
 
   const areaInfo = getAreaInfoByPlantIndex(pending.plantIndex);
   const isBlurred = pending.photoQuality === 'blurred';
+  const validPhotoCount = getValidPhotosByBatch(session.batchId).length;
+  const isFirstPlant = pending.plantIndex <= 1;
+  const isLastPlant = pending.plantIndex >= TARGET_PLANT_COUNT;
+
+  const handlePlantNavigation = (targetPlantIndex: number) => {
+    const safePlantIndex = Math.max(1, Math.min(TARGET_PLANT_COUNT, targetPlantIndex));
+    const nextSession = { ...session, currentPlantIndex: safePlantIndex };
+    const shouldBlur = shouldShowBlurredImage(
+      safePlantIndex,
+      nextSession.retakeCountByPlant,
+      nextSession.blurredPlantIndexes,
+    );
+
+    saveCaptureSession(nextSession);
+    savePendingCapture({
+      batchId: session.batchId,
+      capturedAt: new Date().toISOString(),
+      imageId: createImageId(safePlantIndex),
+      photoQuality: shouldBlur ? 'blurred' : 'clear',
+      plantIndex: safePlantIndex,
+    });
+    setNavigationVersion((version) => version + 1);
+  };
 
   const handleSave = () => {
     if (isBlurred) return;
@@ -65,6 +94,16 @@ export default function BlurCheckPage() {
         <div className={isBlurred ? 'warning-strip' : 'success-strip'}>
           {isBlurred ? t.blurCheck.blurredWarning : t.blurCheck.clearMessage}
         </div>
+        <section className="summary-grid preview-summary-grid">
+          <SummaryCard title={t.capture.validPhotos} value={validPhotoCount} note={t.capture.analysisTarget} tone="good" />
+          <SummaryCard title={t.capture.retakes} value={session.totalBlurredRetakeCount} tone="warning" />
+          <SummaryCard
+            title={t.capture.currentArea}
+            value={areaInfo.areaId}
+            note={`Plant ${String(areaInfo.areaStartPlant).padStart(3, '0')}-${String(areaInfo.areaEndPlant).padStart(3, '0')}`}
+          />
+          <SummaryCard title={t.capture.storage} value={t.common.sdCardMock || STORAGE_LABEL} tone="info" />
+        </section>
         <div className="confirm-layout">
           <PhotoPreviewMock
             imagePath={isBlurred ? IMAGE_PATHS.blurred : IMAGE_PATHS.original}
@@ -86,6 +125,27 @@ export default function BlurCheckPage() {
               {t.blurCheck.note}
             </p>
           </div>
+        </div>
+        <div className="plant-navigation-row" aria-label={t.blurCheck.plantNavigation}>
+          <button
+            className="button button-secondary"
+            disabled={isFirstPlant}
+            onClick={() => handlePlantNavigation(pending.plantIndex - 1)}
+            type="button"
+          >
+            {t.blurCheck.previousPlant}
+          </button>
+          <span>
+            Plant {String(pending.plantIndex).padStart(3, '0')} / {String(TARGET_PLANT_COUNT).padStart(3, '0')}
+          </span>
+          <button
+            className="button button-secondary"
+            disabled={isLastPlant}
+            onClick={() => handlePlantNavigation(pending.plantIndex + 1)}
+            type="button"
+          >
+            {t.blurCheck.nextPlant}
+          </button>
         </div>
         <div className="button-row">
           <button className="button button-primary button-large" disabled={isBlurred} onClick={handleSave} type="button">

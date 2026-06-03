@@ -1,22 +1,23 @@
 import { useI18n } from '../i18n/LanguageContext';
+import SpectralMarkerOverlay from './SpectralMarkerOverlay';
+import { getSpectralDetectionMarkers } from '../utils/spectralMarkers';
 
 type BeforeAfterComparisonProps = {
   beforeImagePath: string;
   afterImagePath: string;
 };
 
-const markers = [
-  { top: '34%', left: '32%' },
-  { top: '48%', left: '58%' },
-  { top: '64%', left: '43%' },
-  { top: '40%', left: '73%' },
-];
-
 export default function BeforeAfterComparison({
   beforeImagePath,
   afterImagePath,
 }: BeforeAfterComparisonProps) {
   const { t } = useI18n();
+  const markers = getSpectralDetectionMarkers({
+    grade: 'B',
+    problemRatio: 0.5,
+    riskScore: 68,
+    seed: 'analysis-result-preview',
+  });
 
   return (
     <section className="before-after-grid" aria-label={t.analysisResult.beforeAfterAria}>
@@ -42,15 +43,7 @@ export default function BeforeAfterComparison({
             className="spectral-analysis-image"
             src={afterImagePath}
           />
-          {markers.map((marker, index) => (
-            <span
-              aria-label={t.analysisResult.markerLabels[index]}
-              className="analysis-marker"
-              key={t.analysisResult.markerLabels[index]}
-              style={{ left: marker.left, top: marker.top }}
-              title={t.analysisResult.markerLabels[index]}
-            />
-          ))}
+          <SpectralMarkerOverlay label={t.analysisResult.afterLabel} markers={markers} />
         </figure>
         <div className="analysis-annotations">
           {t.analysisResult.annotations.map((annotation) => (

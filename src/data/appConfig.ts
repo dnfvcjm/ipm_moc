@@ -24,7 +24,7 @@ export const WEEK_OPTIONS = [
 ];
 
 export const IMAGE_PATHS = {
-  original: '/images/tomato-leaf.jpg',
-  blurred: '/images/tomato-leaf.jpg',
+  original: '/images/capture-leaf-preview.png',
+  blurred: '/images/capture-leaf-preview.png',
   spectral: '/images/c033f113-f253-474d-be29-944804835778.png',
 };
