@@ -53,9 +53,9 @@ export default function AreaHeatmap({ summaries, onSelectArea, compact = false }
   const selectedSummary = activeSummary ?? getPreferredActiveSummary(laneMaps);
   const activeKey = selectedSummary ? `${selectedSummary.laneNo}-${selectedSummary.areaId}` : '';
   const laneColumns = laneMaps
-    .map((_, index) => (index < laneMaps.length - 1 ? 'minmax(88px, 1fr) minmax(20px, 30px)' : 'minmax(88px, 1fr)'))
+    .map((_, index) => (index < laneMaps.length - 1 ? 'minmax(64px, 1fr) minmax(14px, 30px)' : 'minmax(64px, 1fr)'))
     .join(' ');
-  const gridTemplateColumns = `minmax(128px, 172px) ${laneColumns}`;
+  const gridTemplateColumns = `minmax(96px, 172px) ${laneColumns}`;
 
   return (
     <div className={`field-map-heatmap integrated-field-view ${compact ? 'compact' : ''}`}>
